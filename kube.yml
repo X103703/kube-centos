@@ -130,3 +130,10 @@
     ansible.builtin.systemd:
       name: kubelet
       enabled: yes
+      
+  - name: Download Calico resources
+    become: yes
+    remote_user: {{cloud_user}}
+    get_url:
+    url: https://docs.projectcalico.org/archive/v3.21/manifests/calico.yaml
+    dest: /home/{{cloud_user}}/calico.yaml
