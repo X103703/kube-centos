@@ -145,13 +145,14 @@
     yum:
       name: ansible
 
-      
- - name: install git
+  - name: Download Calicoctl
     become: yes
     remote_user: "{{cloud_user}}"
-    become_method: sudo
-    yum:
-      name: git
+    get_url:
+      url: https://github.com/projectcalico/calicoctl/releases/download/v3.21.2/calicoctl 
+      dest: /home/{{cloud_user}}/calicoctl
+      validate_certs: false     
+ 
      
       
   - name: Download Calico resources
