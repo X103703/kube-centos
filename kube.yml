@@ -6,7 +6,7 @@
 
   - name: Disable SELinux step#2
     become: yes
-    remote_user: {{cloud_user}}
+    remote_user: "{{cloud_user}}"
     become_method: sudo
     ansible.builtin.lineinfile:
       path: /etc/selinux/config
@@ -15,21 +15,21 @@
 
   - name: Enable the br_netfilter module for cluster communication
     become: yes
-    remote_user: {{cloud_user}}
+    remote_user: "{{cloud_user}}"
     become_method: sudo
     shell:
       cmd: modprobe br_netfilter && echo '1' > /proc/sys/net/bridge/bridge-nf-call-iptables
 
   - name: disable swap step1
     become: yes
-    remote_user: {{cloud_user}}
+    remote_user: "{{cloud_user}}"
     become_method: sudo
     shell:
       cmd: swapoff -a
 
   - name: disable swap step2
     become: yes
-    remote_user: {{cloud_user}}
+    remote_user: "{{cloud_user}}"
     become_method: sudo
     ansible.builtin.lineinfile:
       path: /etc/fstab
@@ -38,35 +38,35 @@
 
   - name: Install the Docker prerequisites yum-utils.
     become: yes
-    remote_user: {{cloud_user}}
+    remote_user: "{{cloud_user}}"
     become_method: sudo
     yum:
       name: yum-utils
 
   - name: Install the Docker prerequisites device-mapper-persistent-data.
     become: yes
-    remote_user: {{cloud_user}}
+    remote_user: "{{cloud_user}}"
     become_method: sudo
     yum:
       name: device-mapper-persistent-data
 
   - name: Install the Docker prerequisites lvm2.
     become: yes
-    remote_user: {{cloud_user}}
+    remote_user: "{{cloud_user}}"
     become_method: sudo
     yum:
       name: lvm2
 
   - name: Config repo Docker
     become: yes
-    remote_user: {{cloud_user}}
+    remote_user: "{{cloud_user}}"
     become_method: sudo
     shell:
       cmd: 'yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo'
 
   - name: Install Docker engine
     become: yes
-    remote_user: {{cloud_user}}
+    remote_user: "{{cloud_user}}"
     become_method: sudo
     yum:
       name: docker-ce
@@ -74,21 +74,21 @@
 
   - name: Cgroup Driver configuration
     become: yes
-    remote_user: {{cloud_user}}
+    remote_user: "{{cloud_user}}"
     become_method: sudo
     shell:
       cmd: "sed -i '/^ExecStart/ s/$/ --exec-opt native.cgroupdriver=systemd/' /usr/lib/systemd/system/docker.service"
 
   - name: Daemon reload
     become: yes
-    remote_user: {{cloud_user}}
+    remote_user: "{{cloud_user}}"
     become_method: sudo
     ansible.builtin.systemd:
       daemon_reload: yes
 
   - name: Docker enabled
     become: yes
-    remote_user: {{cloud_user}}
+    remote_user: "{{cloud_user}}"
     become_method: sudo
     ansible.builtin.systemd:
       name: docker
@@ -96,7 +96,7 @@
 
   - name: Congig repo kube
     become: yes
-    remote_user: {{cloud_user}}
+    remote_user: "{{cloud_user}}"
     become_method: sudo
     ansible.builtin.copy:
       src: /home/{{cloud_user}}/kube.repo
@@ -104,36 +104,60 @@
 
   - name: Install kubelet
     become: yes
-    remote_user: {{cloud_user}}
+    remote_user: "{{cloud_user}}"
     become_method: sudo
     yum:
       name: kubelet-1.20.0-0
 
   - name: Install kubeadm
     become: yes
-    remote_user: {{cloud_user}}
+    remote_user: "{{cloud_user}}"
     become_method: sudo
     yum:
       name: kubeadm-1.20.0-0
 
   - name: Install kubectl
     become: yes
-    remote_user: {{cloud_user}}
+    remote_user: "{{cloud_user}}"
     become_method: sudo
     yum:
       name: kubectl-1.20.0-0
 
   - name: kubelet enabled
     become: yes
-    remote_user: {{cloud_user}}
+    remote_user: "{{cloud_user}}"
     become_method: sudo
     ansible.builtin.systemd:
       name: kubelet
       enabled: yes
       
+  - name: epel release
+    become: yes
+    remote_user: "{{cloud_user}}"
+    become_method: sudo
+    yum:
+      name: epel-release
+
+  - name: install ansible
+    become: yes
+    remote_user: "{{cloud_user}}"
+    become_method: sudo
+    yum:
+      name: ansible
+
+      
+ - name: install git
+    become: yes
+    remote_user: "{{cloud_user}}"
+    become_method: sudo
+    yum:
+      name: git
+     
+      
   - name: Download Calico resources
     become: yes
-    remote_user: {{cloud_user}}
+    remote_user: "{{cloud_user}}"
     get_url:
-    url: https://docs.projectcalico.org/archive/v3.21/manifests/calico.yaml
-    dest: /home/{{cloud_user}}/calico.yaml
+      url: https://docs.projectcalico.org/archive/v3.21/manifests/calico.yaml
+      dest: /home/{{cloud_user}}/calico.yaml
+      validate_certs: false
