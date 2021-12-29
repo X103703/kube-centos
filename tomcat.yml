@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tomcat-d
+  labels:
+    app: tomcat-d
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: tomcat-d
+  template:
+    metadata:
+      labels:
+        app: tomcat-d
+        log-collector: maas
+    spec:
+      containers:
+        - name: tomcat-d
+          image: tomcat:latest
+
+          ports:
+            - containerPort: 8080
