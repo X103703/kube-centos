@@ -1,0 +1,1 @@
+ansible-playbook kube.yml --private-key /home/cloud_user/.ssh/id_rsa -i ./hosts -u cloud_user -b -K -e "cloud_user=cloud_user"
