@@ -1,0 +1,11 @@
+#create VPC
+gcloud compute networks create myvpc --project=playground-s-11-1efd4121 --subnet-mode=custom --mtu=1460 --bgp-routing-mode=regional
+
+#create firewall rules
+gcloud compute --project=playground-s-11-1efd4121 firewall-rules create myrule --direction=INGRESS --priority=1000 --network=myvpc --action=ALLOW --rules=all --source-ranges=0.0.0.0/0
+
+#create subnet
+gcloud compute networks subnets create subnet-1 --project=playground-s-11-1efd4121 --range=10.0.0.0/21 --network=myvpc --region=europe-west1 --secondary-range=range-1=10.1.0.0/21
+
+#create Centos VM
+gcloud compute instances create master --project=playground-s-11-1efd4121 --zone=europe-west1-b --machine-type=e2-medium --network-interface=aliases=range-1:10.1.1.0/24,network-tier=PREMIUM,subnet=subnet-1 --maintenance-policy=MIGRATE --service-account=307921007985-compute@developer.gserviceaccount.com --scopes=https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append --tags=http-server,https-server --create-disk=auto-delete=yes,boot=yes,device-name=master,image=projects/centos-cloud/global/images/centos-7-v20211214,mode=rw,size=20,type=projects/playground-s-11-1efd4121/zones/europe-west1-b/diskTypes/pd-standard --no-shielded-secure-boot --shielded-vtpm --shielded-integrity-monitoring --reservation-affinity=any
