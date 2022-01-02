@@ -94,13 +94,13 @@
       name: docker
       enabled: yes
       
-  - name: Docker enabled
+  - name: restart sdocker ervice 
     become: yes
     remote_user: "{{cloud_user}}"
     become_method: sudo
     ansible.builtin.systemd:
-      name: docker
-      status: started
+    state: started
+    name: docker
 
   - name: Congig repo kube
     become: yes
