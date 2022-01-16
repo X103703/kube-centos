@@ -138,7 +138,52 @@
     ansible.builtin.systemd:
       name: kubelet
       enabled: yes
+
+- hosts: master
+  tasks:
+
+  - name: Create .kube directory
+    become: yes
+    remote_user: "{{cloud_user}}"
+    become_method: sudo
+    shell:
+      cmd: 'mkdir /home/cloud_user/.kube'
+
+  - name: kubeadm init
+    become: yes
+    remote_user: "{{cloud_user}}"
+    become_method: sudo
+    shell:
+      cmd: 'kubeadm init --pod-network-cidr=10.2.0.0/21'
+
+  - name: kubeadm print token step1
+    become: yes
+    remote_user: "{{cloud_user}}"
+    become_method: sudo
+    shell:
+      cmd: 'kubeadm token create --print-join-command > /home/cloud_user/token'
       
+  - name: kubeadm print token step2
+    become: yes
+    remote_user: "{{cloud_user}}"
+    become_method: sudo
+    shell:
+      cmd: 'echo $(cat /home/cloud_user/token) --experimental-control-plane > /tmp/join'
+      
+  - name: fetch token from first master
+    become: yes
+    remote_user: "{{cloud_user}}"
+    become_method: sudo
+    fetch:
+      src: /tmp/join
+      dest: /tmp/join
+
+  - name: copy kubectl config file
+    become: yes
+    remote_user: "{{cloud_user}}"
+    become_method: sudo
+    shell:
+      cmd: 'cp /etc/kubernetes/admin.conf /home/cloud_user/.kube && chown cloud_user:cloud_user /home/cloud_user/.kube/admin.conf'
   
   - name: Download Calicoctl
     become: yes
